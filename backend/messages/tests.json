@@ -1,0 +1,29 @@
+{
+  "tests": [
+    {
+      "name": "Get messages for chat c1",
+      "method": "GET",
+      "path": "/?chat_id=c1",
+      "expectedStatus": 200,
+      "expectedBody": [],
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get chats for user u0",
+      "method": "GET",
+      "path": "/chats?user_id=u0",
+      "expectedStatus": 200,
+      "expectedBody": [],
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Send message",
+      "method": "POST",
+      "path": "/",
+      "body": {"chat_id": "c1", "sender_id": "u0", "text": "Тест сообщение"},
+      "expectedStatus": 200,
+      "expectedBody": {"senderId": "u0"},
+      "bodyMatcher": "partial"
+    }
+  ]
+}

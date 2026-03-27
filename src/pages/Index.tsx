@@ -5,14 +5,21 @@ import ContactsPage from '@/components/messenger/ContactsPage';
 import StatusesPage from '@/components/messenger/StatusesPage';
 import GalleryPage from '@/components/messenger/GalleryPage';
 import ProfilePage from '@/components/messenger/ProfilePage';
+import CallModal from '@/components/messenger/CallModal';
 import Icon from '@/components/ui/icon';
-import { chats } from '@/data/mockData';
+import { chats, Chat } from '@/data/mockData';
 
 type Tab = 'chats' | 'contacts' | 'statuses' | 'gallery' | 'profile';
+
+interface ActiveCall {
+  chat: Chat;
+  type: 'audio' | 'video';
+}
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState<Tab>('chats');
   const [activeChatId, setActiveChatId] = useState<string | null>('c1');
+  const [activeCall, setActiveCall] = useState<ActiveCall | null>(null);
 
   const activeChat = chats.find(c => c.id === activeChatId) || null;
 
@@ -26,6 +33,10 @@ export default function Index() {
     setActiveTab('chats');
   };
 
+  const handleCallStart = (type: 'audio' | 'video', chat: Chat) => {
+    setActiveCall({ chat, type });
+  };
+
   const renderRightPanel = () => {
     if (activeTab === 'contacts') return <ContactsPage />;
     if (activeTab === 'statuses') return <StatusesPage />;
@@ -34,7 +45,7 @@ export default function Index() {
 
     if (activeTab === 'chats') {
       if (activeChat) {
-        return <ChatWindow key={activeChat.id} chat={activeChat} />;
+        return <ChatWindow key={activeChat.id} chat={activeChat} onCallStart={handleCallStart} />;
       }
       return (
         <div className="flex-1 flex flex-col items-center justify-center gap-6 bg-mesh h-full">
@@ -47,7 +58,7 @@ export default function Index() {
               Выберите чат слева, чтобы начать общение
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap justify-center">
             <div className="px-4 py-2 rounded-full border border-purple-600/30 text-xs text-purple-400 bg-purple-600/10">
               🔒 Конец-в-конец шифрование
             </div>
@@ -88,6 +99,15 @@ export default function Index() {
           renderRightPanel()
         )}
       </div>
+
+      {/* Call modal overlay */}
+      {activeCall && (
+        <CallModal
+          chat={activeCall.chat}
+          callType={activeCall.type}
+          onEnd={() => setActiveCall(null)}
+        />
+      )}
     </div>
   );
 }
